@@ -11,7 +11,6 @@
  * Return: EXIT_SUCCESS on success, or EXIT_FAILURE on failure
  */
 
-
 int main(int argc, char *argv[]);
 int main(int argc, char *argv[])
 {
@@ -20,8 +19,10 @@ int main(int argc, char *argv[])
 	size_t len = 0;
 	ssize_t read;
 	char *opcode;
+	char *value_str;
 	int value;
 	stack_t *stack = NULL;
+	unsigned int line_number = 0;
 
 	if (argc != 2)
 	{
@@ -29,29 +30,36 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	file = fopen(argv[1], "r");
+	file = fopen(argv[0], "r");
 	if (file == NULL)
 	{
-		fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
+		fprintf(stderr, "Error: Can't open file %s\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
 	while ((read = getline(&line, &len, file)) != -1)
 	{
+		line_number++;
 		opcode = strtok(line, " \n");
-		value = atoi(strtok(NULL, " \n"));
 
 		if (strcmp(opcode, "push") == 0)
 		{
+			value_str = strtok(NULL, " \n");
+			if (value_str == NULL || isdigit(value_str) == 0)
+			{
+				fprintf(stderr, "L%d: usage: push integer\n", line_number);
+				exit(EXIT_FAILURE);
+			}
+			value = atoi(value_str);
 			push(&stack, value);
 		}
 		else if (strcmp(opcode, "pall") == 0)
 		{
-			pall(&stack, value);
+			pall(&stack, line_number);
 		}
 		else
 		{
-			fprintf(stderr, "L%d: unknown instruction %s\n", value, opcode);
+			fprintf(stderr, "L%d: unknown instruction %s\n", line_number, opcode);
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -61,3 +69,4 @@ int main(int argc, char *argv[])
 
 	return (0);
 }
+
