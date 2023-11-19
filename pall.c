@@ -16,7 +16,11 @@ void pall(stack_t **stack, unsigned int line_number)
 
 	/* If the stack is empty, do nothing */
 	if (tmp == NULL)
-		return;
+	{
+		fprintf(stderr, "L%d: can't pall, stack empty\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	return;
 
 	(void)line_number;
 

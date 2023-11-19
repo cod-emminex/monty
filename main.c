@@ -41,6 +41,8 @@ int main(int argc, char *argv[])
 	{
 		line_number++;
 		opcode = strtok(line, " \n");
+		if (opcode == NULL)
+			continue;
 
 		if (strcmp(opcode, "push") == 0)
 		{
@@ -52,21 +54,30 @@ int main(int argc, char *argv[])
 			}
 			value = atoi(value_str);
 			push(&stack, value);
+			if (strtok(NULL, " \n") != NULL)
+			{
+				fprintf(stderr, "L%d: usage: push integer\n", line_number);
+				exit(EXIT_FAILURE);
+			}
 		}
 		else if (strcmp(opcode, "pall") == 0)
 		{
+			if (strtok(NULL, " \n") != NULL)
+			{
+				fprintf(stderr, "L%d: usage: pall\n", line_number);
+				exit(EXIT_FAILURE);
+			}
 			pall(&stack, line_number);
 		}
 		else
 		{
-			fprintf(stderr, "L%d: unknown instruction %s\n", line_number, opcode);
+			fprintf(stderr, "L%d: unknown instruction %s\n", line_number,
+					opcode);
+
 			exit(EXIT_FAILURE);
 		}
+		free(line);
+		fclose(file);
 	}
-
-	free(line);
-	fclose(file);
-
 	return (0);
 }
-
